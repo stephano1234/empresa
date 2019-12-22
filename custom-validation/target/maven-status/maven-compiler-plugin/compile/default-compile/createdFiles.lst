@@ -1,0 +1,9 @@
+br\com\contmatic\anotacoes\CPFbr.class
+br\com\contmatic\anotacoes\CollectionComElementoNaoNulo.class
+br\com\contmatic\utilidades\ConstantesNumericas.class
+br\com\contmatic\utilidades\ConstantesString.class
+br\com\contmatic\utilidades\MensagensErro.class
+br\com\contmatic\anotacoes\CNPJbr.class
+br\com\contmatic\anotacoes\CNPJbrValidador.class
+br\com\contmatic\anotacoes\CollectionComElementoNaoNuloValidador.class
+br\com\contmatic\anotacoes\CPFbrValidador.class
