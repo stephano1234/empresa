@@ -1,9 +1,12 @@
 package br.com.contmatic.utilidades;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -169,6 +172,7 @@ public class Verificadores {
 	 * @param tiposArgumentos the tipos argumentos
 	 * @return true, if successful
 	 */
+	@Deprecated
 	public static boolean verificaConstrutor(Class<?> classe, Object[] valores, Class<?>... tiposArgumentos) {
 		Preconditions.checkNotNull(classe, "A classe deve ser informada.");
 		Preconditions.checkNotNull(valores, "Os valores de inicialização do construtor devem ser informados.");
@@ -210,6 +214,7 @@ public class Verificadores {
 	 * @param classe the classe
 	 * @return the sets the
 	 */
+	@Deprecated
 	public static Set<Method> trazMetodosGetters(Class<?> classe) {
 		Set<Method> metodosGet = new HashSet<>();
 		for (int i = 0; i < classe.getDeclaredMethods().length; i++) {
@@ -218,6 +223,121 @@ public class Verificadores {
 			}
 		}
 		return metodosGet;
+	}
+
+	public static boolean verificaEncapsulamentos(Class<?> classe) {
+		Object objeto = classeNewer(classe);
+		List<Field> campos = Arrays.asList(classe.getDeclaredFields());
+		List<Method> metodosSet = metodosSetters(classe, campos);
+		List<Method> metodosGet = metodosGetters(classe, campos);
+		Object[] valores = geraValoresCampos(campos);
+		if (metodosGet.size() == metodosSet.size()) {
+			if (metodosGet.size() == campos.size()) {
+				for (int i = 0; i < valores.length; i++) {
+					try {
+						metodosSet.get(i).invoke(objeto, campos.get(i).getType().cast(valores[i]));
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return false;
+					}
+					try {
+						if (valores[i] != metodosGet.get(i).invoke(objeto)) {
+							return false;
+						}
+					} catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						return false;
+					}
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Object classeNewer(Class<?> classe) {
+		if (classe.isInterface()) {
+			return classe.cast(Proxy.newProxyInstance(null, new Class[] {classe}, new InvocationHandler() {
+				@Override
+				public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+					return null;
+				}
+			}));
+		}
+		try {
+			return classe.getDeclaredConstructor().newInstance();
+		} catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException
+				| NoSuchMethodException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private static List<Method> metodosSetters(Class<?> classe, List<Field> campos) {
+		List<Method> metodosSet = new ArrayList<>();
+		StringBuilder nomeMetodoSetter = new StringBuilder();
+		for (Field campo : campos) {
+			for (Method metodo : classe.getDeclaredMethods()) {
+				nomeMetodoSetter.append("set").append(campo.getName());
+				if (metodo.getName().equalsIgnoreCase(nomeMetodoSetter.toString())) {
+					metodosSet.add(metodo);
+				}
+				nomeMetodoSetter.setLength(0);
+			}
+		}
+		return metodosSet;
+	}
+
+	private static List<Method> metodosGetters(Class<?> classe, List<Field> campos) {
+		List<Method> metodosGet = new ArrayList<>();
+		StringBuilder nomeMetodoGetter = new StringBuilder();
+		for (Field campo : campos) {
+			for (Method metodo : classe.getDeclaredMethods()) {
+				nomeMetodoGetter.append("get").append(campo.getName());
+				if (metodo.getName().equalsIgnoreCase(nomeMetodoGetter.toString())) {
+					metodosGet.add(metodo);
+				}
+				nomeMetodoGetter.setLength(0);
+			}
+		}
+		return metodosGet;
+	}
+
+	private static Object[] geraValoresCampos(List<Field> campos) {
+		Object[] valores = new Object[campos.size()];
+		int i = 0;
+		for (Field campo : campos) {
+			if (campo.getType().isPrimitive()) {
+				geraValoresCamposPrimitivos(valores, i, campo.getType());
+				i++;
+				continue;
+			}
+			if (campo.getType().isEnum()) {
+				geraValoresCamposEnum(valores, i, campo.getType());
+				i++;
+				continue;
+			}
+			valores[i] = classeNewer(campo.getType());
+			i++;
+		}
+		return valores;
+	}
+
+	private static void geraValoresCamposPrimitivos(Object[] valores, int i, Class<?> classeCampo) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	private static void geraValoresCamposEnum(Object[] valores, int i, Class<?> classeCampo) {
+		try {
+			valores[i] = classeCampo.getEnumConstants()[0];
+		} catch (ArrayIndexOutOfBoundsException | IllegalArgumentException | SecurityException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 
 }
