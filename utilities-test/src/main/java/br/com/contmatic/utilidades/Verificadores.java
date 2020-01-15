@@ -27,6 +27,8 @@ import com.google.common.base.Preconditions;
  */
 public class Verificadores {
 
+	private static final String MENSAGEM_ERRO_NAO_INFORMADA = "A mensagem do erro procurado deve ser informada.";
+
 	/** The Constant PARAM_NULO. */
 	private static final String PARAM_NULO = "O objeto testado não pode ser nulo.";
 
@@ -37,7 +39,7 @@ public class Verificadores {
 	private static ValidatorFactory factory;
 
 	/** The logger. */
-	private static Logger logger;
+	private static Logger logger = Logger.getGlobal();
 
 	/**
 	 * Instantiates a new verificadores.
@@ -54,7 +56,7 @@ public class Verificadores {
 	 */
 	public static boolean verificaErro(Object objetoTestado, String mensagem) {
 		Preconditions.checkNotNull(objetoTestado, PARAM_NULO);
-		Preconditions.checkNotNull(mensagem, "A mensagem do erro procurado deve ser informada.");
+		Preconditions.checkNotNull(mensagem, MENSAGEM_ERRO_NAO_INFORMADA);
 		factory = Validation.buildDefaultValidatorFactory();
 		validator = factory.getValidator();
 		boolean possuiErro = false;
@@ -127,7 +129,7 @@ public class Verificadores {
 	 * @return the string
 	 */
 	public static String transformaCaractereEmUnicode(String string) {
-		String letrasAcentuadas = "ÁáÉéÍíÓóÚúÀàÂâÊêÔôÃãÕõªºç";
+		String letrasAcentuadas = "ÁáÉéÍíÓóÚúÀàÂâÊêÔôÃãÕõªºçÇ";
 		Map<String, String> tabelaAcentos = new LinkedHashMap<>();
 		tabelaAcentos.put("Á", "\\u00C1");
 		tabelaAcentos.put("á", "\\u00E1");
@@ -152,6 +154,7 @@ public class Verificadores {
 		tabelaAcentos.put("ª", "\\u00AA");
 		tabelaAcentos.put("º", "\\u00BA");
 		tabelaAcentos.put("ç", "\\u00E7");
+		tabelaAcentos.put("Ç", "\\u00C7");
 		StringBuilder stringTransformada = new StringBuilder(string);
 		String letraAcentuada;
 		for (int i = 0; i < stringTransformada.length(); i++) {

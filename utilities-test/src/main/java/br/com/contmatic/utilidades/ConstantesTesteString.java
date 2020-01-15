@@ -6,7 +6,7 @@ package br.com.contmatic.utilidades;
 public class ConstantesTesteString {
     
     /** The Constant UNVIVERSO_CARACTERES. */
-    public static final String UNVIVERSO_CARACTERES = "AZQSWXCDERÁÉÍÓÚáéíóúÃÕãõÀàÂÊÔâêô FVBGTYHNMJUIKLOPÇ><:?}{`´^~ºª=+§-_)(*&¨%#@!¹²³£¢¬1234567890qazxswedcvfrtgbnhyujmkilopç,.;/\\]['\"";
+    public static final String UNVIVERSO_CARACTERES = "AZQSWXCDERÁÉÍÓÚáéíóúÃÕãõÀàÂÊÔâêô FVBGTYHNMJUIKLOPÇ><:?}{`´^~ºª°=+§-_)(*&¨%#@!¹²³$£¢¬1234567890qazxswedcvfrtgbnhyujmkilopç,.;|/\\]['\"";
     
     /** The Constant APENAS_NUMERAL. */
     public static final String APENAS_NUMERAL = "[0-9]";
